@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ShopFácil — Sua loja favorita</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:#f5f5f5;color:#222;min-height:100vh}
+a{text-decoration:none;color:inherit}
+ul{list-style:none}
+:root{
+  --primary:#ee4d2d;
+  --primary-dark:#c73d20;
+  --primary-light:#fff3f0;
+  --accent:#ff2d55;
+  --border:#e8e8e8;
+  --muted:#888;
+  --shadow:0 2px 14px rgba(0,0,0,.09);
+  --radius:12px;
+  --radius-sm:8px;
+}
+.container{max-width:1280px;margin:0 auto;padding:0 14px}
+
+/* ── HEADER ── */
+.header{position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.header-top{background:#c73d20;color:#fff;font-size:.75rem;padding:5px 0;display:none}
+@media(min-width:768px){.header-top{display:block}}
+.header-top-inner{display:flex;align-items:center;gap:10px}
+.header-top-right{margin-left:auto;display:flex;gap:14px}
+.header-top-right a{color:rgba(255,255,255,.85);transition:opacity .2s}
+.header-top-right a:hover{opacity:1;color:#fff}
+
+.header-main{background:var(--primary);padding:10px 0}
+.header-main-inner{display:flex;align-items:center;gap:12px}
+
+.logo{display:flex;align-items:center;gap:6px;color:#fff;font-size:1.45rem;font-weight:900;white-space:nowrap;flex-shrink:0}
+.logo i{font-size:1.6rem}
+.logo-text{display:none}
+@media(min-width:480px){.logo-text{display:inline}}
+
+.search-bar{flex:1;display:flex;border-radius:4px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.18);min-width:0}
+.search-bar input{flex:1;border:none;padding:10px 14px;font-size:.9rem;font-family:'Nunito',sans-serif;outline:none;color:#222;min-width:0}
+.search-bar button{background:#f9a580;border:none;color:#fff;padding:0 16px;font-size:.85rem;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;transition:background .2s;white-space:nowrap}
+.search-bar button:hover{background:#fff;color:var(--primary)}
+
+.header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.cart-btn{position:relative;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.5);color:#fff;font-size:1.1rem;cursor:pointer;padding:7px 12px;border-radius:6px;transition:background .2s;display:flex;align-items:center;gap:6px}
+.cart-btn:hover{background:rgba(255,255,255,.28)}
+.cart-badge{background:#ffdd00;color:#222;font-size:.65rem;font-weight:900;min-width:18px;height:18px;border-radius:9px;padding:0 4px;display:flex;align-items:center;justify-content:center}
+.login-btn{background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.6);color:#fff;padding:7px 14px;border-radius:6px;font-size:.82rem;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;white-space:nowrap;transition:background .2s}
+.login-btn:hover{background:rgba(255,255,255,.32)}
+
+.header-nav{background:#d44326;overflow-x:auto;scrollbar-width:none}
+.header-nav::-webkit-scrollbar{display:none}
+.nav-inner{display:flex;white-space:nowrap;min-width:max-content}
+.nav-inner a{color:rgba(255,255,255,.85);padding:9px 14px;font-size:.8rem;font-weight:700;border-bottom:3px solid transparent;transition:all .2s;display:inline-flex;align-items:center;gap:5px}
+.nav-inner a:hover,.nav-inner a.active{color:#fff;border-bottom-color:#fff;background:rgba(255,255,255,.1)}
+
+/* ── CART SIDEBAR ── */
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none}
+.cart-overlay.open{display:block;animation:fadeIn .2s}
+.cart-sidebar{position:fixed;top:0;right:-420px;width:360px;max-width:92vw;height:100vh;background:#fff;z-index:201;display:flex;flex-direction:column;box-shadow:-4px 0 28px rgba(0,0,0,.18);transition:right .3s cubic-bezier(.4,0,.2,1)}
+.cart-sidebar.open{right:0}
+.cart-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;background:var(--primary);color:#fff}
+.cart-header h3{font-size:1rem;font-weight:800;display:flex;align-items:center;gap:8px}
+.cart-header button{background:rgba(255,255,255,.2);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.cart-header button:hover{background:rgba(255,255,255,.4)}
+.cart-items{flex:1;overflow-y:auto;padding:14px}
+.cart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);gap:12px;padding:40px}
+.cart-empty i{font-size:3rem;opacity:.25}
+.cart-empty p{font-size:.9rem}
+.cart-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);animation:slideIn .3s}
+.cart-item-icon{width:56px;height:56px;background:var(--primary-light);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
+.cart-item-info{flex:1;min-width:0}
+.cart-item-info h4{font-size:.8rem;font-weight:700;margin-bottom:4px;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.cart-item-price{color:var(--primary);font-weight:800;font-size:.9rem}
+.cart-item-actions{display:flex;align-items:center;gap:8px;margin-top:6px}
+.qty-btn{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:.85rem;font-weight:900;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.qty-btn:hover{background:var(--primary);border-color:var(--primary);color:#fff}
+.qty-val{font-weight:800;min-width:20px;text-align:center;font-size:.9rem}
+.remove-btn{margin-left:auto;background:none;border:none;color:#ccc;cursor:pointer;font-size:.9rem;padding:4px;transition:color .2s}
+.remove-btn:hover{color:#ef4444}
+.cart-footer{padding:14px 18px;border-top:2px solid var(--border);background:#fafafa}
+.cart-total{display:flex;justify-content:space-between;margin-bottom:12px;font-size:1rem;align-items:center}
+.cart-total strong{color:var(--primary);font-size:1.2rem}
+.checkout-btn{width:100%;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:.95rem;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;transition:background .2s,transform .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.checkout-btn:hover{background:var(--primary-dark);transform:translateY(-1px)}
+
+/* ── MODALS ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex;animation:fadeIn .2s}
+.modal{background:#fff;border-radius:var(--radius);width:100%;max-width:400px;position:relative;animation:slideUp .3s;max-height:92vh;overflow-y:auto}
+.modal-close{position:absolute;top:12px;right:12px;background:#f1f1f1;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;z-index:1;transition:background .2s}
+.modal-close:hover{background:#ddd}
+.modal-inner{padding:28px}
+.modal-logo{font-size:1.3rem;font-weight:900;color:var(--primary);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.modal h2{font-size:1.1rem;font-weight:800;margin-bottom:18px;color:#333}
+.modal-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:18px}
+.tab{flex:1;padding:9px;background:none;border:none;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab-content input{display:block;width:100%;border:1.5px solid var(--border);border-radius:8px;padding:11px 13px;margin-bottom:12px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;transition:border .2s}
+.tab-content input:focus{border-color:var(--primary)}
+.modal-btn{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:.95rem;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;margin-top:4px;transition:background .2s}
+.modal-btn:hover{background:var(--primary-dark)}
+.modal-footer-text{text-align:center;margin-top:14px;color:var(--muted);font-size:.83rem}
+.modal-footer-text a{color:var(--primary);font-weight:700}
+
+/* Product Modal */
+.product-modal{max-width:660px;padding:0;overflow:hidden}
+.pm-top{display:flex;flex-direction:column}
+@media(min-width:600px){.pm-top{flex-direction:row}}
+.pm-img{min-height:220px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:5rem;flex-shrink:0}
+@media(min-width:600px){.pm-img{width:240px;min-height:280px}}
+.pm-details{padding:22px}
+.pm-tag{display:inline-block;background:var(--primary-light);color:var(--primary);font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:20px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.pm-details h2{font-size:1.05rem;font-weight:800;margin-bottom:8px;line-height:1.35}
+.pm-stars{color:#f59e0b;font-size:.85rem;margin-bottom:10px}
+.pm-stars span{color:var(--muted);font-size:.78rem;margin-left:6px}
+.pm-price-old{color:var(--muted);text-decoration:line-through;font-size:.85rem}
+.pm-price{font-size:1.7rem;font-weight:900;color:var(--primary);margin:3px 0 6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pm-discount{background:var(--primary);color:#fff;font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:4px}
+.pm-desc{color:var(--muted);font-size:.84rem;line-height:1.65;margin-bottom:14px}
+.pm-qty-wrap{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.pm-qty-wrap label{font-weight:700;font-size:.85rem}
+.pm-qty{width:52px;height:36px;border:1.5px solid var(--border);border-radius:6px;text-align:center;font-size:.95rem;font-family:'Nunito',sans-serif;outline:none}
+.pm-qty:focus{border-color:var(--primary)}
+.pm-add-btn{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:.95rem;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s,transform .15s}
+.pm-add-btn:hover{background:var(--primary-dark);transform:translateY(-1px)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:16px;left:16px;max-width:380px;margin:0 auto;background:#1a1a1a;color:#fff;padding:13px 20px;border-radius:10px;font-size:.87rem;font-weight:700;z-index:9999;transform:translateY(120px);opacity:0;transition:all .35s cubic-bezier(.4,0,.2,1);pointer-events:none;text-align:center}
+@media(min-width:480px){.toast{left:auto;right:24px;text-align:left}}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:#16a34a}
+.toast.info{background:#2563eb}
+
+/* ── BANNER ── */
+.banner{background:#fff;padding:14px 0}
+.banner-slider{position:relative;border-radius:var(--radius);overflow:hidden}
+.banner-slide{display:none;padding:28px 24px;min-height:180px;align-items:center;justify-content:space-between;gap:12px;border-radius:var(--radius);animation:fadeIn .5s}
+@media(min-width:600px){.banner-slide{padding:40px 48px;min-height:210px}}
+.banner-slide.active{display:flex}
+.banner-text{max-width:60%;color:#fff}
+.banner-tag{display:inline-block;background:rgba(255,255,255,.22);padding:3px 12px;border-radius:20px;font-size:.72rem;font-weight:800;margin-bottom:10px;letter-spacing:.5px}
+.banner-text h1{font-size:1.35rem;font-weight:900;line-height:1.2;margin-bottom:8px}
+@media(min-width:600px){.banner-text h1{font-size:1.9rem}}
+.banner-text p{font-size:.83rem;opacity:.9;margin-bottom:16px;line-height:1.5}
+.banner-btn{background:#fff;color:var(--primary);border:none;cursor:pointer;padding:9px 22px;border-radius:30px;font-size:.85rem;font-family:'Nunito',sans-serif;font-weight:800;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 16px rgba(0,0,0,.18)}
+.banner-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.22)}
+.banner-img{font-size:4.5rem;opacity:.22;color:#fff;animation:float 3s ease-in-out infinite;flex-shrink:0}
+@media(min-width:600px){.banner-img{font-size:7rem}}
+.banner-dots{display:flex;justify-content:center;gap:7px;margin-top:12px}
+.dot{width:7px;height:7px;border-radius:50%;background:#ccc;cursor:pointer;transition:all .3s}
+.dot.active{background:var(--primary);width:22px;border-radius:4px}
+
+/* ── QUICK CATEGORIES ── */
+.quick-cats{background:#fff;padding:16px 0;margin-top:3px}
+.qcat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(min-width:600px){.qcat-grid{grid-template-columns:repeat(8,1fr)}}
+.qcat{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:transform .2s;padding:6px}
+.qcat:hover{transform:translateY(-4px)}
+.qcat-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:var(--shadow);transition:box-shadow .2s}
+.qcat:hover .qcat-icon{box-shadow:0 6px 20px rgba(0,0,0,.13)}
+.qcat span{font-size:.72rem;font-weight:700;color:#444;text-align:center}
+
+/* ── FLASH STRIP ── */
+.flash-strip{background:linear-gradient(90deg,#ee4d2d,#ff2d55);color:#fff;padding:11px 0;margin-top:3px}
+.flash-inner{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.flash-label{font-weight:900;font-size:.95rem;display:flex;align-items:center;gap:6px}
+.flash-timer{background:rgba(0,0,0,.22);padding:4px 16px;border-radius:30px;font-weight:900;font-size:1rem;font-variant-numeric:tabular-nums;letter-spacing:2px}
+.flash-sub{font-size:.78rem;opacity:.85;margin-left:auto}
+
+/* ── MAIN ── */
+.main-content{padding:20px 0 40px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.section-header h2{font-size:1.15rem;font-weight:900;display:flex;align-items:center;gap:8px}
+.sort-bar{display:flex;align-items:center;gap:8px;font-size:.83rem}
+.sort-bar select{border:1.5px solid var(--border);border-radius:8px;padding:6px 11px;font-family:'Nunito',sans-serif;font-size:.83rem;outline:none;cursor:pointer;background:#fff}
+
+/* ── PRODUCT CARD ── */
+.products-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:480px){.products-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:700px){.products-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1000px){.products-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1200px){.products-grid{grid-template-columns:repeat(5,1fr)}}
+
+.product-card{background:#fff;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s;cursor:pointer;animation:fadeInUp .4s both;position:relative}
+.product-card:hover{transform:translateY(-5px);box-shadow:0 10px 32px rgba(0,0,0,.13)}
+.p-badge{position:absolute;top:8px;left:8px;font-size:.67rem;font-weight:800;padding:3px 8px;border-radius:4px;z-index:2;color:#fff}
+.p-badge.sale{background:#ee4d2d}
+.p-badge.hot{background:#f59e0b}
+.p-badge.new{background:#7c3aed}
+.wish-btn{position:absolute;top:6px;right:6px;background:rgba(255,255,255,.88);border:none;cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;color:#ccc;transition:all .2s;z-index:2}
+.wish-btn:hover,.wish-btn.liked{color:#ef4444;transform:scale(1.15)}
+.p-img{width:100%;height:140px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:3.5rem;transition:transform .3s}
+@media(min-width:600px){.p-img{height:160px}}
+.product-card:hover .p-img{transform:scale(1.07)}
+.p-info{padding:10px}
+.p-name{font-size:.8rem;font-weight:700;color:#333;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4}
+.p-rating{display:flex;align-items:center;gap:4px;font-size:.73rem;margin-bottom:5px;color:var(--muted)}
+.p-rating .stars{color:#f59e0b}
+.p-price-row{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap;margin-bottom:3px}
+.p-price{font-size:1rem;font-weight:900;color:var(--primary)}
+.p-old{font-size:.72rem;color:var(--muted);text-decoration:line-through}
+.p-disc{font-size:.67rem;background:#fff3f0;color:var(--primary);font-weight:800;padding:2px 5px;border-radius:3px}
+.p-loc{font-size:.69rem;color:var(--muted);margin-bottom:7px}
+.p-loc i{margin-right:3px}
+.p-add{width:100%;padding:8px;background:var(--primary-light);color:var(--primary);border:1.5px solid var(--primary);border-radius:7px;font-size:.78rem;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px}
+.p-add:hover{background:var(--primary);color:#fff}
+
+.no-results{text-align:center;padding:60px 20px;color:var(--muted)}
+.no-results i{font-size:3rem;margin-bottom:16px;display:block;opacity:.35}
+.no-results p{font-size:1rem;font-weight:700}
+
+/* ── FOOTER ── */
+.footer{background:#222;color:#aaa;padding:40px 0 0;margin-top:6px}
+.footer-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;padding-bottom:32px;border-bottom:1px solid #333}
+@media(min-width:768px){.footer-grid{grid-template-columns:2fr 1fr 1fr 1fr}}
+.footer-logo{font-size:1.3rem;font-weight:900;color:#fff;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.footer p{font-size:.82rem;line-height:1.7}
+.social-links{display:flex;gap:10px;margin-top:14px}
+.social-links a{width:36px;height:36px;background:#333;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:.95rem;transition:background .2s,color .2s}
+.social-links a:hover{background:var(--primary);color:#fff}
+.footer h4{color:#fff;font-size:.88rem;font-weight:800;margin-bottom:12px}
+.footer ul li{margin-bottom:7px}
+.footer ul li a{font-size:.8rem;color:#aaa;transition:color .2s}
+.footer ul li a:hover{color:var(--primary)}
+.pay-icons{display:flex;gap:10px;flex-wrap:wrap}
+.pay-icons i{font-size:1.9rem;color:#888}
+.sec-badge{display:inline-flex;align-items:center;gap:6px;background:#333;color:#aaa;padding:5px 12px;border-radius:6px;font-size:.78rem;font-weight:700;margin-top:10px}
+.footer-bottom{text-align:center;padding:18px;font-size:.78rem;color:#555}
+
+/* ── PROMO BANNER ── */
+.promo-row{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0}
+@media(min-width:600px){.promo-row{grid-template-columns:1fr 1fr 1fr}}
+.promo-card{border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px;color:#fff;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.promo-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.promo-icon{font-size:2rem;flex-shrink:0}
+.promo-card h3{font-size:.9rem;font-weight:800;margin-bottom:2px}
+.promo-card p{font-size:.75rem;opacity:.85}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+</style>
+</head>
+<body>
+
+<!-- HEADER TOP -->
+<header class="header">
+  <div class="header-top">
+    <div class="container header-top-inner">
+      <span>📱 Baixe o App ShopFácil</span>
+      <span style="opacity:.4">|</span>
+      <span>🛍️ Venda no ShopFácil</span>
+      <div class="header-top-right">
+        <a href="#"><i class="fa-regular fa-bell"></i> Notificações</a>
+        <a href="#"><i class="fa-regular fa-circle-question"></i> Ajuda</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-main">
+    <div class="container header-main-inner">
+      <div class="logo">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <span class="logo-text">Shop<strong>Fácil</strong></span>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Buscar produtos, marcas e mais…"/>
+        <button onclick="searchProducts()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+      </div>
+      <div class="header-actions">
+        <button class="cart-btn" onclick="toggleCart()" title="Carrinho">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </button>
+        <button class="login-btn" onclick="toggleLoginModal()"><i class="fa-regular fa-user"></i> Entrar</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="header-nav">
+    <div class="container nav-inner" id="navInner">
+      <a href="#" class="active" onclick="filterCat('all',this)">Todos</a>
+      <a href="#" onclick="filterCat('eletronicos',this)"><i class="fa-solid fa-mobile-screen-button"></i> Eletrônicos</a>
+      <a href="#" onclick="filterCat('moda',this)"><i class="fa-solid fa-shirt"></i> Moda</a>
+      <a href="#" onclick="filterCat('casa',this)"><i class="fa-solid fa-house"></i> Casa</a>
+      <a href="#" onclick="filterCat('beleza',this)"><i class="fa-solid fa-spa"></i> Beleza</a>
+      <a href="#" onclick="filterCat('esportes',this)"><i class="fa-solid fa-dumbbell"></i> Esportes</a>
+      <a href="#" onclick="filterCat('jogos',this)"><i class="fa-solid fa-gamepad"></i> Jogos</a>
+      <a href="#" onclick="filterCat('livros',this)"><i class="fa-solid fa-book"></i> Livros</a>
+    </div>
+  </nav>
+</header>
+
+<!-- CART SIDEBAR -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<aside class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header">
+    <h3><i class="fa-solid fa-cart-shopping"></i> Meu Carrinho</h3>
+    <button onclick="toggleCart()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty"><i class="fa-solid fa-bag-shopping"></i><p>Seu carrinho está vazio</p></div>
+  </div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-total"><span>Total:</span><strong id="cartTotal">R$ 0,00</strong></div>
+    <button class="checkout-btn" onclick="checkout()"><i class="fa-solid fa-lock"></i> Finalizar Compra</button>
+  </div>
+</aside>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="loginModal" onclick="closeMod(event,'loginModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="hideMod('loginModal')"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-inner">
+      <div class="modal-logo"><i class="fa-solid fa-bag-shopping"></i> Shop<strong>Fácil</strong></div>
+      <h2>Entrar na sua conta</h2>
+      <div class="modal-tabs">
+        <button class="tab active" onclick="switchTab('phone',this)">Telefone</button>
+        <button class="tab" onclick="switchTab('email',this)">E-mail</button>
+      </div>
+      <div id="phoneTab" class="tab-content">
+        <input type="tel" placeholder="Número de telefone"/>
+        <input type="password" placeholder="Senha"/>
+      </div>
+      <div id="emailTab" class="tab-content" style="display:none">
+        <input type="email" placeholder="E-mail"/>
+        <input type="password" placeholder="Senha"/>
+      </div>
+      <button class="modal-btn" onclick="fakeLogin()">Entrar</button>
+      <p class="modal-footer-text">Não tem conta? <a href="#">Cadastre-se grátis</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="productModal" onclick="closeMod(event,'productModal')">
+  <div class="modal product-modal">
+    <button class="modal-close" onclick="hideMod('productModal')"><i class="fa-solid fa-xmark"></i></button>
+    <div id="productModalBody"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- BANNER -->
+<section class="banner">
+  <div class="container">
+    <div class="banner-slider">
+      <div class="banner-slide active" style="background:linear-gradient(135deg,#ee4d2d,#ff2d55)">
+        <div class="banner-text">
+          <div class="banner-tag">🔥 OFERTA RELÂMPAGO</div>
+          <h1>Até <strong>70% OFF</strong><br>em Eletrônicos</h1>
+          <p>Smartphones, notebooks e muito mais com frete grátis!</p>
+          <button class="banner-btn" onclick="filterCat('eletronicos',null)">Aproveitar agora →</button>
+        </div>
+        <div class="banner-img">📱</div>
+      </div>
+      <div class="banner-slide" style="background:linear-gradient(135deg,#7c3aed,#db2777)">
+        <div class="banner-text">
+          <div class="banner-tag">👗 MODA PRIMAVERA</div>
+          <h1>Nova coleção <strong>2026</strong></h1>
+          <p>Roupas, calçados e acessórios com os melhores preços.</p>
+          <button class="banner-btn" onclick="filterCat('moda',null)">Ver coleção →</button>
+        </div>
+        <div class="banner-img">👗</div>
+      </div>
+      <div class="banner-slide" style="background:linear-gradient(135deg,#059669,#0891b2)">
+        <div class="banner-text">
+          <div class="banner-tag">🏠 SEMANA DO LAR</div>
+          <h1>Casa & Decoração<br><strong>Frete Grátis</strong></h1>
+          <p>Deixe sua casa ainda mais bonita por menos.</p>
+          <button class="banner-btn" onclick="filterCat('casa',null)">Explorar →</button>
+        </div>
+        <div class="banner-img">🛋️</div>
+      </div>
+    </div>
+    <div class="banner-dots" id="bannerDots">
+      <span class="dot active" onclick="goSlide(0)"></span>
+      <span class="dot" onclick="goSlide(1)"></span>
+      <span class="dot" onclick="goSlide(2)"></span>
+    </div>
+  </div>
+</section>
+
+<!-- PROMO CARDS -->
+<section style="background:#fff;padding:12px 0;margin-top:3px">
+  <div class="container">
+    <div class="promo-row">
+      <div class="promo-card" style="background:linear-gradient(135deg,#f59e0b,#ef4444)" onclick="filterCat('eletronicos',null)">
+        <div class="promo-icon">⚡</div>
+        <div><h3>Flash Sale</h3><p>Ofertas por tempo limitado</p></div>
+      </div>
+      <div class="promo-card" style="background:linear-gradient(135deg,#3b82f6,#7c3aed)" onclick="filterCat('moda',null)">
+        <div class="promo-icon">🚚</div>
+        <div><h3>Frete Grátis</h3><p>Em milhares de produtos</p></div>
+      </div>
+      <div class="promo-card" style="background:linear-gradient(135deg,#10b981,#059669)" onclick="showToast('🌱 Programa de cashback disponível!','success')">
+        <div class="promo-icon">💰</div>
+        <div><h3>Cashback</h3><p>Ganhe de volta em cada compra</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUICK CATEGORIES -->
+<section class="quick-cats">
+  <div class="container">
+    <div class="qcat-grid">
+      <div class="qcat" onclick="filterCat('eletronicos',null)">
+        <div class="qcat-icon" style="background:#fff3f0"><span style="font-size:1.3rem">📱</span></div>
+        <span>Eletrônicos</span>
+      </div>
+      <div class="qcat" onclick="filterCat('moda',null)">
+        <div class="qcat-icon" style="background:#fdf4ff"><span style="font-size:1.3rem">👗</span></div>
+        <span>Moda</span>
+      </div>
+      <div class="qcat" onclick="filterCat('casa',null)">
+        <div class="qcat-icon" style="background:#f0fdf4"><span style="font-size:1.3rem">🏠</span></div>
+        <span>Casa</span>
+      </div>
+      <div class="qcat" onclick="filterCat('beleza',null)">
+        <div class="qcat-icon" style="background:#fff0f6"><span style="font-size:1.3rem">💄</span></div>
+        <span>Beleza</span>
+      </div>
+      <div class="qcat" onclick="filterCat('esportes',null)">
+        <div class="qcat-icon" style="background:#eff6ff"><span style="font-size:1.3rem">🏋️</span></div>
+        <span>Esportes</span>
+      </div>
+      <div class="qcat" onclick="filterCat('jogos',null)">
+        <div class="qcat-icon" style="background:#fefce8"><span style="font-size:1.3rem">🎮</span></div>
+        <span>Jogos</span>
+      </div>
+      <div class="qcat" onclick="filterCat('livros',null)">
+        <div class="qcat-icon" style="background:#f0fdfa"><span style="font-size:1.3rem">📚</span></div>
+        <span>Livros</span>
+      </div>
+      <div class="qcat" onclick="filterCat('all',null)">
+        <div class="qcat-icon" style="background:#f8fafc"><span style="font-size:1.3rem">🛍️</span></div>
+        <span>Ver Tudo</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLASH STRIP -->
+<div class="flash-strip">
+  <div class="container flash-inner">
+    <div class="flash-label"><i class="fa-solid fa-bolt"></i> Oferta Relâmpago</div>
+    <div class="flash-timer" id="flashTimer">03:47:00</div>
+    <div class="flash-sub">⚠️ Estoque limitado!</div>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<main class="main-content" id="mainContent">
+  <div class="container">
+    <div class="section-header">
+      <h2 id="sectionTitle">🔥 Produtos em Destaque</h2>
+      <div class="sort-bar">
+        <label>Ordenar:</label>
+        <select id="sortSel" onchange="applyFilters()">
+          <option value="default">Relevância</option>
+          <option value="price-asc">Menor Preço</option>
+          <option value="price-desc">Maior Preço</option>
+          <option value="rating">Melhor Avaliação</option>
+          <option value="sold">Mais Vendidos</option>
+        </select>
+      </div>
+    </div>
+    <div class="products-grid" id="productsGrid"></div>
+    <div class="no-results" id="noResults" style="display:none">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <p>Nenhum produto encontrado. Tente outro termo.</p>
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <div class="footer-logo"><i class="fa-solid fa-bag-shopping"></i> Shop<strong>Fácil</strong></div>
+      <p>Sua loja online de confiança com os melhores preços do Brasil.</p>
+      <div class="social-links">
+        <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+      </div>
+    </div>
+    <div>
+      <h4>Atendimento</h4>
+      <ul>
+        <li><a href="#">Central de Ajuda</a></li>
+        <li><a href="#">Rastrear Pedido</a></li>
+        <li><a href="#">Trocas e Devoluções</a></li>
+        <li><a href="#">Fale Conosco</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Sobre</h4>
+      <ul>
+        <li><a href="#">Quem Somos</a></li>
+        <li><a href="#">Privacidade</a></li>
+        <li><a href="#">Termos de Uso</a></li>
+        <li><a href="#">Trabalhe Conosco</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Pagamentos</h4>
+      <div class="pay-icons">
+        <i class="fa-brands fa-cc-visa" title="Visa"></i>
+        <i class="fa-brands fa-cc-mastercard" title="Mastercard"></i>
+        <i class="fa-brands fa-cc-paypal" title="PayPal"></i>
+        <i class="fa-solid fa-barcode" title="Boleto"></i>
+      </div>
+      <div class="sec-badge"><i class="fa-solid fa-lock"></i> Compra 100% Segura</div>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 ShopFácil. Todos os direitos reservados.</div>
+</footer>
+
+<script>
+// ── DATA ──
+  const products = [
+  {id:1,  name:"Smartphone Samsung Galaxy A55 5G 128GB",       cat:"eletronicos", price:1299.90, old:1899.90, icon:"📱", stars:4.8, sold:2341, loc:"São Paulo, SP",   badge:"sale", desc:"Tela Super AMOLED 6.6\", câmera 50MP tripla, bateria 5000mAh e processador Exynos 1480."},
+  {id:2,  name:"Notebook Dell Inspiron i5 8GB 512GB SSD",      cat:"eletronicos", price:2799.00, old:3599.00, icon:"💻", stars:4.7, sold:893,  loc:"São Paulo, SP",   badge:"sale", desc:"Core i5, 8GB RAM DDR4, SSD 512GB NVMe, tela Full HD 15.6\" antirreflexo."},
+  {id:3,  name:"Fone Bluetooth JBL Tune 520BT",                cat:"eletronicos", price:219.90,  old:349.90,  icon:"🎧", stars:4.6, sold:5102, loc:"Rio de Janeiro",  badge:"hot",  desc:"57h de bateria, Pure Bass Sound, dobrável e leve. Compatível Android/iOS."},
+  {id:4,  name:"Smart TV 50\" 4K UHD LG NanoCell",             cat:"eletronicos", price:1899.00, old:2599.00, icon:"📺", stars:4.9, sold:712,  loc:"Campinas, SP",    badge:"sale", desc:"4K UHD, NanoCell, webOS 23, Wi-Fi integrado, 4 entradas HDMI."},
+  {id:5,  name:"Tablet Samsung Galaxy Tab A9+ 128GB",          cat:"eletronicos", price:1149.90, old:1499.90, icon:"📟", stars:4.5, sold:421,  loc:"Belo Horizonte",  badge:"new",  desc:"Tela 11\" LCD, Snapdragon 695, câmera 13MP, bateria 7040mAh."},
+  {id:6,  name:"Câmera Sony Alpha ZV-E10 Mirrorless",          cat:"eletronicos", price:3299.00, old:4299.00, icon:"📷", stars:4.9, sold:318,  loc:"Curitiba, PR",    badge:"sale", desc:"Sensor APS-C 24MP, vídeo 4K, ideal para criadores de conteúdo."},
+  {id:7,  name:"Tênis Nike Air Max 270 Original Masculino",    cat:"moda",        price:499.90,  old:699.90,  icon:"👟", stars:4.8, sold:3200, loc:"São Paulo, SP",   badge:"hot",  desc:"Amortecimento Air Max 270°, cabedal de malha respirável, sola durável."},
+  {id:8,  name:"Vestido Midi Floral Feminino Verão 2026",      cat:"moda",        price:89.90,   old:149.90,  icon:"👗", stars:4.6, sold:1540, loc:"Fortaleza, CE",   badge:"new",  desc:"100% viscose, estampa floral exclusiva, alças reguláveis."},
+  {id:9,  name:"Jaqueta Corta Vento Unissex Adidas",           cat:"moda",        price:259.90,  old:399.90,  icon:"🧥", stars:4.7, sold:890,  loc:"Porto Alegre, RS",badge:"sale", desc:"Ripstop resistente, capuz ajustável, dois bolsos com zíper."},
+  {id:10, name:"Óculos de Sol Polarizado Ray-Ban Aviador",     cat:"moda",        price:399.00,  old:599.00,  icon:"🕶️", stars:4.9, sold:672,  loc:"Rio de Janeiro",  badge:"sale", desc:"Lentes polarizadas UV400, armação metal, proteção solar categoria 3."},
+  {id:11, name:"Bolsa Feminina Couro PU Crossbody",            cat:"moda",        price:129.90,  old:219.90,  icon:"👜", stars:4.5, sold:2100, loc:"São Paulo, SP",   badge:"new",  desc:"Alça transversal regulável, múltiplos compartimentos, fecho magnético."},
+  {id:12, name:"Panela Elétrica de Pressão Mondial 5L",        cat:"casa",        price:249.90,  old:399.90,  icon:"🍲", stars:4.7, sold:2891, loc:"Manaus, AM",      badge:"sale", desc:"5L, 12 funções, display digital, tampa de vidro temperado."},
+  {id:13, name:"Luminária de Mesa LED Flexível",               cat:"casa",        price:89.90,   old:139.90,  icon:"💡", stars:4.6, sold:1205, loc:"Recife, PE",      badge:"new",  desc:"Temperatura ajustável, USB para carregar, braço flexível 360°."},
+  {id:14, name:"Aspirador Robô Wi-Fi Mapeamento LiDAR",        cat:"casa",        price:699.00,  old:999.00,  icon:"🤖", stars:4.8, sold:540,  loc:"São Paulo, SP",   badge:"hot",  desc:"Mapeamento LiDAR, controle por app, 3 modos de limpeza, 2600mAh."},
+  {id:15, name:"Jogo de Cama King 200 Fios 100% Algodão",      cat:"casa",        price:149.90,  old:249.90,  icon:"🛏️", stars:4.5, sold:3400, loc:"Americana, SP",   badge:"sale", desc:"4 peças, 100% algodão penteado, lavável na máquina até 40°C."},
+  {id:16, name:"Conjunto de Panelas Tramontina 7 Peças",       cat:"casa",        price:329.00,  old:499.00,  icon:"🍳", stars:4.9, sold:980,  loc:"Caxias do Sul",   badge:"sale", desc:"Antiaderente Starflon, tampa vidro temperado, alça baquelite."},
+  {id:17, name:"Perfume La Vie Est Belle Lancôme 75ml",        cat:"beleza",      price:389.90,  old:599.90,  icon:"🌸", stars:4.9, sold:1820, loc:"São Paulo, SP",   badge:"hot",  desc:"Iris absolutus, pralinê de baunilha e patchouli. Floral-oriental feminina."},
+  {id:18, name:"Kit Skincare Vitamina C Completo 4 Itens",     cat:"beleza",      price:129.90,  old:219.90,  icon:"✨", stars:4.7, sold:2650, loc:"Rio de Janeiro",  badge:"new",  desc:"Sérum, hidratante, protetor solar e esfoliante. Combate manchas."},
+  {id:19, name:"Secador Profissional Taiff 2300W",             cat:"beleza",      price:199.90,  old:349.90,  icon:"💇", stars:4.6, sold:1100, loc:"Goiânia, GO",     badge:"sale", desc:"2300W, difusor e concentrador inclusos, 2 velocidades e 3 temperaturas."},
+  {id:20, name:"Paleta de Sombras Nude 12 Cores",              cat:"beleza",      price:219.90,  old:349.90,  icon:"💄", stars:4.8, sold:890,  loc:"São Paulo, SP",   badge:"sale", desc:"12 cores nude versáteis, alta pigmentação, longa duração, fácil esfumado."},
+  {id:21, name:"Bicicleta MTB Aro 29 Alumínio 21v",            cat:"esportes",    price:1299.00, old:1899.00, icon:"🚴", stars:4.7, sold:430,  loc:"Curitiba, PR",    badge:"sale", desc:"Quadro alumínio série 6061, freio a disco, suspensão dianteira 100mm."},
+  {id:22, name:"Tênis de Corrida Mizuno Wave Rider 27",        cat:"esportes",    price:449.90,  old:649.90,  icon:"🏃", stars:4.9, sold:780,  loc:"São Paulo, SP",   badge:"hot",  desc:"Tecnologia Wave, Drop 12mm, peso 282g, sola carbono."},
+  {id:23, name:"Halteres Emborrachados Par 10kg",              cat:"esportes",    price:149.90,  old:219.90,  icon:"🏋️", stars:4.6, sold:2100, loc:"Belo Horizonte",  badge:"new",  desc:"Revestimento emborrachado, acabamento hexagonal, par 10kg."},
+  {id:24, name:"Tapete Yoga Antiderrapante 6mm",               cat:"esportes",    price:129.90,  old:199.90,  icon:"🧘", stars:4.8, sold:1560, loc:"Florianópolis",   badge:"sale", desc:"6mm espessura, material ecológico, antiderrapante, 183×61cm."},
+  {id:25, name:"Controle DualSense PlayStation 5 Original",   cat:"jogos",       price:399.90,  old:499.90,  icon:"🎮", stars:4.9, sold:3200, loc:"São Paulo, SP",   badge:"hot",  desc:"Feedback háptico, gatilhos adaptáveis, microfone embutido."},
+  {id:26, name:"Headset Gamer HyperX Cloud II 7.1",           cat:"jogos",       price:349.00,  old:549.00,  icon:"🎧", stars:4.8, sold:1890, loc:"Campinas, SP",    badge:"sale", desc:"Virtual 7.1, drivers 53mm, microfone removível com cancelamento de ruído."},
+  {id:27, name:"Cadeira Gamer ThunderX3 EC3 RGB",             cat:"jogos",       price:999.00,  old:1399.00, icon:"🪑", stars:4.7, sold:620,  loc:"São Paulo, SP",   badge:"sale", desc:"Reclinável 90-180°, apoio lombar ajustável, iluminação RGB."},
+  {id:28, name:"Placa de Vídeo RTX 4060 Ti ASUS 8GB",         cat:"jogos",       price:2799.00, old:3499.00, icon:"🖥️", stars:4.8, sold:345,  loc:"Rio de Janeiro",  badge:"sale", desc:"8GB GDDR6, Ray Tracing, DLSS 3, boost 2535MHz, 3 ventoinhas."},
+  {id:29, name:"A Sutil Arte de Ligar o F*da-se",             cat:"livros",      price:39.90,   old:59.90,   icon:"📚", stars:4.8, sold:12400,loc:"São Paulo, SP",   badge:"hot",  desc:"Mark Manson. Autoajuda sem frescura, best-seller mundial. Capa dura."},
+  {id:30, name:"Sapiens — Uma Breve História da Humanidade",  cat:"livros",      price:44.90,   old:69.90,   icon:"📖", stars:4.9, sold:8900, loc:"São Paulo, SP",   badge:"hot",  desc:"Yuval Noah Harari. Como o Homo Sapiens dominou o mundo."},
+  {id:31, name:"Box Harry Potter — Edição Especial 7 Volumes",cat:"livros",      price:189.90,  old:299.90,  icon:"⚡", stars:4.9, sold:5600, loc:"Belo Horizonte",  badge:"sale", desc:"Coleção completa, capa dura, ilustrações exclusivas e estojo colecionável."},
+  {id:32, name:"Eu, Robô — Isaac Asimov Edição Comemorativa", cat:"livros",      price:49.90,   old:79.90,   icon:"🤖", stars:4.7, sold:2300, loc:"Curitiba, PR",    badge:"new",  desc:"As Leis da Robótica em 9 histórias clássicas. Edição comemorativa."},
+];
+
+// ── STATE ──
+let cart=[], wishlist=new Set(), currentCat='all', searchTerm='', currentSlide=0;
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded',()=>{
+  renderProducts(products);
+  startTimer();
+  startSlider();
+});
+
+// ── FORMAT ──
+const fmt=v=>'R$ '+v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+const fmtSold=n=>n>=1000?(n/1000).toFixed(1)+'k':n;
+const stars=r=>'★'.repeat(Math.round(r))+'☆'.repeat(5-Math.round(r));
+const disc=p=>Math.round((1-p.price/p.old)*100);
+
+// ── RENDER ──
+function renderProducts(list){
+  const g=document.getElementById('productsGrid');
+  const nr=document.getElementById('noResults');
+  g.innerHTML='';
+  if(!list.length){nr.style.display='block';return;}
+  nr.style.display='none';
+  list.forEach((p,i)=>{
+    const d=disc(p);
+    const bLabel={sale:`-${d}%`,hot:'🔥 Hot',new:'Novo'};
+    const bClass={sale:'sale',hot:'hot',new:'new'};
+    const card=document.createElement('div');
+    card.className='product-card';
+    card.style.animationDelay=`${i*0.04}s`;
+    card.innerHTML=`
+      ${p.badge?`<div class="p-badge ${bClass[p.badge]}">${bLabel[p.badge]}</div>`:''}
+      <button class="wish-btn" id="w${p.id}" onclick="toggleWish(event,${p.id})" title="Favoritar">
+        <i class="fa-regular fa-heart"></i>
+      </button>
+      <div class="p-img" onclick="openProd(${p.id})">${p.icon}</div>
+      <div class="p-info">
+        <div class="p-name" onclick="openProd(${p.id})">${p.name}</div>
+        <div class="p-rating"><span class="stars">${stars(p.stars)}</span>${p.stars} · ${fmtSold(p.sold)} vendidos</div>
+        <div class="p-price-row">
+          <span class="p-price">${fmt(p.price)}</span>
+          <span class="p-old">${fmt(p.old)}</span>
+          <span class="p-disc">-${d}%</span>
+        </div>
+        <div class="p-loc"><i class="fa-solid fa-location-dot"></i>${p.loc}</div>
+        <button class="p-add" onclick="addCart(${p.id})"><i class="fa-solid fa-cart-plus"></i> Adicionar</button>
+      </div>`;
+    g.appendChild(card);
+  });
+}
+
+// ── FILTER / SORT ──
+  function filterCat(cat,el){
+  currentCat=cat; searchTerm='';
+  document.getElementById('searchInput').value='';
+  document.querySelectorAll('.nav-inner a').forEach(a=>a.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else{
+    const idx=['all','eletronicos','moda','casa','beleza','esportes','jogos','livros'];
+    const i=idx.indexOf(cat);
+    if(i>=0) document.querySelectorAll('.nav-inner a')[i]?.classList.add('active');
+  }
+  const titles={all:'🔥 Produtos em Destaque',eletronicos:'📱 Eletrônicos',moda:'👗 Moda & Estilo',
+    casa:'🏠 Casa & Cozinha',beleza:'✨ Beleza & Cuidados',esportes:'💪 Esportes & Fitness',
+    jogos:'🎮 Games & Tecnologia',livros:'📚 Livros'};
+  document.getElementById('sectionTitle').textContent=titles[cat]||'Produtos';
+  applyFilters();
+  document.getElementById('mainContent').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function searchProducts(){
+  searchTerm=document.getElementById('searchInput').value.trim().toLowerCase();
+  currentCat='all';
+  document.querySelectorAll('.nav-inner a').forEach(a=>a.classList.remove('active'));
+  document.querySelector('.nav-inner a').classList.add('active');
+  document.getElementById('sectionTitle').textContent=searchTerm?`🔍 Resultados para "${searchTerm}"` :'🔥 Produtos em Destaque';
+  applyFilters();
+}
+function applyFilters(){
+  let list=[...products];
+  if(currentCat!=='all') list=list.filter(p=>p.cat===currentCat);
+  if(searchTerm) list=list.filter(p=>p.name.toLowerCase().includes(searchTerm)||p.desc.toLowerCase().includes(searchTerm));
+  const s=document.getElementById('sortSel').value;
+  if(s==='price-asc') list.sort((a,b)=>a.price-b.price);
+  else if(s==='price-desc') list.sort((a,b)=>b.price-a.price);
+  else if(s==='rating') list.sort((a,b)=>b.stars-a.stars);
+  else if(s==='sold') list.sort((a,b)=>b.sold-a.sold);
+  renderProducts(list);
+}
+
+// ── CART ──
+function addCart(id,qty=1){
+  const p=products.find(x=>x.id===id);
+  if(!p)return;
+  const ex=cart.find(i=>i.id===id);
+  if(ex) ex.qty+=qty; else cart.push({...p,qty});
+  updCart();
+  showToast(`✅ Adicionado ao carrinho!`,'success');
+  const cb=document.querySelector('.cart-btn');
+  cb.style.transform='scale(1.3)'; setTimeout(()=>cb.style.transform='',300);
+}
+function remCart(id){cart=cart.filter(i=>i.id!==id);updCart();}
+function chgQty(id,d){
+  const it=cart.find(i=>i.id===id);
+  if(!it)return;
+  it.qty+=d;
+  if(it.qty<=0) remCart(id); else updCart();
+}
+function updCart(){
+  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const count=cart.reduce((s,i)=>s+i.qty,0);
+  document.getElementById('cartBadge').textContent=count;
+  document.getElementById('cartTotal').textContent=fmt(total);
+  document.getElementById('cartFooter').style.display=cart.length?'block':'none';
+  const ci=document.getElementById('cartItems');
+  if(!cart.length){
+    ci.innerHTML='<div class="cart-empty"><i class="fa-solid fa-bag-shopping"></i><p>Seu carrinho está vazio</p></div>';
+    return;
+  }
+  ci.innerHTML=cart.map(it=>`
+    <div class="cart-item">
+      <div class="cart-item-icon">${it.icon}</div>
+      <div class="cart-item-info">
+        <h4>${it.name}</h4>
+        <div class="cart-item-price">${fmt(it.price)}</div>
+        <div class="cart-item-actions">
+          <button class="qty-btn" onclick="chgQty(${it.id},-1)">−</button>
+          <span class="qty-val">${it.qty}</span>
+          <button class="qty-btn" onclick="chgQty(${it.id},+1)">+</button>
+          <button class="remove-btn" onclick="remCart(${it.id})" title="Remover"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function toggleCart(){
+  document.getElementById('cartSidebar').classList.toggle('open');
+  document.getElementById('cartOverlay').classList.toggle('open');
+  document.body.style.overflow=document.getElementById('cartSidebar').classList.contains('open')?'hidden':'';
+}
+function checkout(){
+  if(!cart.length)return;
+  const t=fmt(cart.reduce((s,i)=>s+i.price*i.qty,0));
+  cart=[]; updCart(); toggleCart();
+  showToast(`🎉 Pedido de ${t} realizado! Obrigado pela compra!`,'success');
+}
+
+// ── PRODUCT MODAL ──
+  function openProd(id){
+  const p=products.find(x=>x.id===id);
+  if(!p)return;
+  const d=disc(p);
+  document.getElementById('productModalBody').innerHTML=`
+    <div class="pm-top">
+      <div class="pm-img">${p.icon}</div>
+      <div class="pm-details">
+        <span class="pm-tag">${p.cat}</span>
+        <h2>${p.name}</h2>
+        <div class="pm-stars">${stars(p.stars)} <span>${p.stars} · ${fmtSold(p.sold)} vendidos</span></div>
+        <div class="pm-price-old">${fmt(p.old)}</div>
+        <div class="pm-price">${fmt(p.price)}<span class="pm-discount">-${d}%</span></div>
+        <p class="pm-desc">${p.desc}</p>
+        <div class="pm-qty-wrap">
+          <label>Qtd:</label>
+          <input type="number" class="pm-qty" id="pmQty" value="1" min="1" max="99"/>
+        </div>
+        <button class="pm-add-btn" onclick="addFromModal(${p.id})">
+          <i class="fa-solid fa-cart-plus"></i> Adicionar ao Carrinho
+        </button>
+      </div>
+    </div>`;
+  showMod('productModal');
+}
+function addFromModal(id){
+  const q=parseInt(document.getElementById('pmQty').value)||1;
+  addCart(id,q); hideMod('productModal');
+}
+
+// ── MODALS ──
+function showMod(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
+function hideMod(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
+function closeMod(e,id){if(e.target===document.getElementById(id))hideMod(id);}
+function toggleLoginModal(){document.getElementById('loginModal').classList.contains('open')?hideMod('loginModal'):showMod('loginModal');}
+function fakeLogin(){hideMod('loginModal');showToast('✅ Login realizado! Bem-vindo(a) ao ShopFácil!','success');}
+function switchTab(t,el){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('phoneTab').style.display=t==='phone'?'block':'none';
+  document.getElementById('emailTab').style.display=t==='email'?'block':'none';
+}
+
+// ── WISHLIST ──
+function toggleWish(e,id){
+  e.stopPropagation();
+  const btn=document.getElementById('w'+id);
+  if(wishlist.has(id)){
+    wishlist.delete(id);
+    btn.innerHTML='<i class="fa-regular fa-heart"></i>';
+    btn.classList.remove('liked');
+    showToast('💔 Removido dos favoritos.');
+  } else {
+    wishlist.add(id);
+    btn.innerHTML='<i class="fa-solid fa-heart" style="color:#ef4444"></i>';
+    btn.classList.add('liked');
+    showToast('❤️ Adicionado aos favoritos!','success');
+  }
+}
+
+// ── TOAST ──
+let toastT;
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className=`toast ${type} show`;
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>{t.className='toast';},3200);
+}
+
+// ── TIMER ──
+  function startTimer(){
+  const end=new Date(Date.now()+3*3600000+47*60000);
+  (function tick(){
+    const diff=end-new Date();
+    if(diff<=0){document.getElementById('flashTimer').textContent='00:00:00';return;}
+    const h=String(Math.floor(diff/3600000)).padStart(2,'0');
+    const m=String(Math.floor(diff%3600000/60000)).padStart(2,'0');
+    const s=String(Math.floor(diff%60000/1000)).padStart(2,'0');
+    document.getElementById('flashTimer').textContent=`${h}:${m}:${s}`;
+    setTimeout(tick,1000);
+  })();
+}
+
+// ── SLIDER ──
+function startSlider(){
+  setInterval(()=>{
+    goSlide((currentSlide+1)%3);
+  },4500);
+}
+function goSlide(n){
+  document.querySelectorAll('.banner-slide')[currentSlide].classList.remove('active');
+  document.querySelectorAll('.dot')[currentSlide].classList.remove('active');
+  currentSlide=n;
+  document.querySelectorAll('.banner-slide')[n].classList.add('active');
+  document.querySelectorAll('.dot')[n].classList.add('active');
+}
+
+// ── SEARCH ON ENTER ──
+document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')searchProducts();});
+</script>
+</body>
+</html>
